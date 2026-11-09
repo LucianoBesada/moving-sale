@@ -38,13 +38,70 @@ function splitMeasurements(m) {
   return { main: main.join(" · "), more };
 }
 
-let items = [];
+let items = [], lastCSV = "";
 function build(rows) {
   return rows.filter(r => r.item).map((r, n) => {
     const x = EXTRA_BY_NAME[norm(r.item)] || {};
-    return { ...r, order: n, photo: x.photo, link: x.link, status: normStatus(r.status), ...splitMeasurements(r.measurements) };
+    return { ...r, order: n, photos: (x.photos || []).map(f => "img/" + f), link: x.link, status: normStatus(r.status), ...splitMeasurements(r.measurements) };
   });
 }
+
+function gallery(i) {
+  if (!i.photos.length) return `<div class="gallery empty"><span class="ph">Photo coming soon</span></div>`;
+  const n = i.photos.length;
+  return `<div class="gallery" data-photos='${esc(JSON.stringify(i.photos))}'>
+    <div class="track">${i.photos.map((src, k) =>
+      `<button class="slide" data-k="${k}" aria-label="Open photo ${k + 1} of ${n}"><img src="${src}" alt="" loading="lazy" draggable="false"></button>`).join("")}</div>
+    ${n > 1 ? `<button class="g-nav prev" aria-label="Previous photo">‹</button><button class="g-nav next" aria-label="Next photo">›</button>
+    <div class="dots">${i.photos.map((_, k) => `<span class="${k ? "" : "on"}"></span>`).join("")}</div>
+    <span class="g-count">1/${n}</span>` : ""}
+  </div>`;
+}
+
+// current slide of a horizontally scrolling track
+const slideIndex = t => Math.round(t.scrollLeft / t.clientWidth);
+const goTo = (t, k) => t.scrollTo({ left: k * t.clientWidth, behavior: "smooth" });
+
+function initGallery(g) {
+  const t = g.querySelector(".track"); if (!t) return;
+  const photos = JSON.parse(g.dataset.photos), n = photos.length;
+  const update = () => {
+    const k = slideIndex(t);
+    g.querySelectorAll(".dots span").forEach((d, j) => d.classList.toggle("on", j === k));
+    const c = g.querySelector(".g-count"); if (c) c.textContent = `${k + 1}/${n}`;
+  };
+  t.addEventListener("scroll", () => requestAnimationFrame(update), { passive: true });
+  g.querySelector(".prev")?.addEventListener("click", () => goTo(t, (slideIndex(t) - 1 + n) % n));
+  g.querySelector(".next")?.addEventListener("click", () => goTo(t, (slideIndex(t) + 1) % n));
+  t.addEventListener("click", e => { const s = e.target.closest(".slide"); if (s) openLightbox(photos, +s.dataset.k); });
+}
+
+// full-screen carousel
+const lb = $("#lightbox"), lbTrack = lb.querySelector(".lb-track");
+let lbN = 0;
+function lbUpdate() {
+  const k = slideIndex(lbTrack);
+  lb.querySelector(".lb-count").textContent = lbN > 1 ? `${k + 1} / ${lbN}` : "";
+}
+function openLightbox(photos, k) {
+  lbN = photos.length;
+  lbTrack.innerHTML = photos.map(src => `<div class="lb-slide"><img src="${src}" alt=""></div>`).join("");
+  lb.classList.toggle("single", lbN < 2);
+  lb.hidden = false; document.body.style.overflow = "hidden";
+  lbTrack.scrollLeft = k * lbTrack.clientWidth; lbUpdate();
+}
+function closeLightbox() { lb.hidden = true; document.body.style.overflow = ""; }
+lbTrack.addEventListener("scroll", () => requestAnimationFrame(lbUpdate), { passive: true });
+lb.querySelector(".lb-close").addEventListener("click", closeLightbox);
+lb.querySelector(".prev").addEventListener("click", () => goTo(lbTrack, (slideIndex(lbTrack) - 1 + lbN) % lbN));
+lb.querySelector(".next").addEventListener("click", () => goTo(lbTrack, (slideIndex(lbTrack) + 1) % lbN));
+lbTrack.addEventListener("click", e => { if (!e.target.closest("img")) closeLightbox(); });
+document.addEventListener("keydown", e => {
+  if (lb.hidden) return;
+  if (e.key === "Escape") closeLightbox();
+  if (e.key === "ArrowLeft") lb.querySelector(".prev").click();
+  if (e.key === "ArrowRight") lb.querySelector(".next").click();
+});
 
 function render() {
   const hide = $("#hide-sold").checked;
@@ -52,10 +109,9 @@ function render() {
   const list = items.slice().sort((a, b) => rank[a.status] - rank[b.status] || a.order - b.order);
   $("#count").textContent = `${items.filter(i => i.status !== "Sold").length} of ${items.length} still available`;
   $("#list").innerHTML = list.filter(i => !(hide && i.status === "Sold")).map(i => {
-    const img = i.photo ? `img/${i.photo}.jpg` : "";
     return `
     <li class="item ${i.status === "Sold" ? "sold" : ""}">
-      <button class="photo" data-img="${img}" style="${img ? `background-image:url('${img}')` : ""}" aria-label="Enlarge photo"><span class="ph">Photo coming soon</span></button>
+      ${gallery(i)}
       <div class="info">
         <div class="name">${esc(i.item)}</div>
         ${i.brand ? `<div class="brand">${esc(i.brand)}</div>` : ""}
@@ -72,17 +128,17 @@ function render() {
       </div>
     </li>`;
   }).join("");
-  document.querySelectorAll(".photo").forEach(b => {
-    if (!b.dataset.img) return;
-    const im = new Image(); im.onload = () => b.querySelector(".ph")?.remove(); im.onerror = () => b.style.backgroundImage = ""; im.src = b.dataset.img;
-  });
+  document.querySelectorAll(".gallery").forEach(initGallery);
 }
 
 async function load() {
   try {
     const res = await fetch(SHEET_CSV_URL + "&t=" + Date.now(), { cache: "no-store" });
     if (!res.ok) throw new Error(res.status);
-    const rows = parseCSV(await res.text());
+    const text = await res.text();
+    if (text === lastCSV) return;          // nothing changed: keep carousels where they are
+    lastCSV = text;
+    const rows = parseCSV(text);
     if (!rows.length) throw new Error("empty");
     items = build(rows);
     $("#notice").hidden = true;
@@ -95,7 +151,5 @@ async function load() {
 }
 
 $("#hide-sold").addEventListener("change", render);
-$("#list").addEventListener("click", e => { const b = e.target.closest(".photo"); if (!b || !b.dataset.img || b.querySelector(".ph")) return; $("#lightbox img").src = b.dataset.img; $("#lightbox").hidden = false; });
-$("#lightbox").addEventListener("click", () => $("#lightbox").hidden = true);
 load();
 setInterval(load, 60000);

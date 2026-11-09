@@ -3,19 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Moving sale – furniture & more</title>
+<title>Moving sale: Everything must go</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header>
-  <h1>Moving sale</h1>
-  <p class="intro">I'm moving abroad and selling my furniture. Neighbours first! All items are in <strong>very good condition</strong> — collection from my flat.</p>
+ <div class="wrap">
+  <h1>Moving sale: Everything must go</h1>
+  <p class="intro">Hi everyone! I'm moving abroad and giving my furniture and household items a new home. Neighbours first! All items are in <strong>very good condition</strong>. Collection directly from my flat. Feel free to message me if you're interested or would like more details.</p>
   <div class="contact">
     <div><span class="label">Name</span><span id="c-name"></span></div>
     <div><span class="label">Address</span><span id="c-address"></span></div>
     <div><span class="label">WhatsApp</span><span id="c-phone"></span></div>
     <a id="c-wa" class="btn wa" href="#">Message me on WhatsApp</a>
   </div>
+ </div>
 </header>
 <main>
   <div class="toolbar">
@@ -26,7 +28,13 @@
   <ul id="list" class="list"></ul>
   <p class="small">Measurements are from the manufacturer's listing; the linked product may show a different colour. Collection from 10 Garrick Close, W5 1AS.</p>
 </main>
-<div id="lightbox" hidden><img alt=""></div>
+<div id="lightbox" hidden role="dialog" aria-label="Photos">
+  <button class="lb-close" aria-label="Close">✕</button>
+  <div class="lb-track"></div>
+  <button class="lb-nav prev" aria-label="Previous photo">‹</button>
+  <button class="lb-nav next" aria-label="Next photo">›</button>
+  <div class="lb-count"></div>
+</div>
 <script src="items.js"></script>
 <script src="app.js"></script>
 </body>

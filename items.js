@@ -10,21 +10,22 @@ const SELLER = {
 const SHEET_ID = "1Ima1cT66dk5cUmO0NLK3YD-jKEIY4ZmHMxxWyUTXecM";
 const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
 
-// Photo number + product link for each item (matched to the sheet by item name).
-// Photos live in /img as <photo>.jpg
+// Photos + product link for each item (matched to the sheet by item name).
+// Photos live in /img, named <item number>-<photo number>.jpg, e.g. "5-1.jpg", "5-2.jpg".
+// The first photo is the main one shown on the card.
 const EXTRAS = {
-  "Black floor lamp with uplighter and reading light": { photo: 1, link: "https://www.ikea.com/nl/en/p/tagarp-floor-uplighter-reading-lamp-black-white-40486387/" },
-  "Black coffee table with bottom shelf":              { photo: 2, link: "https://www.ikea.com/gb/en/p/lack-tv-bench-white-00625521/" },
-  "Grey and white ergonomic office chair":             { photo: 3, link: "https://www.amazon.co.uk/dp/B0BLNW3P7M" },
-  "Grey desk with white legs":                         { photo: 4, link: "https://www.ikea.com/gb/en/p/lagkapten-adils-desk-white-stained-oak-effect-white-s79416874/" },
-  "Burgundy 2-drawer chest":                           { photo: 5, link: "https://www.ikea.com/gb/en/p/malm-chest-of-2-drawers-high-gloss-white-50336552/" },
-  "Light wood slatted shelving unit":                  { photo: 6, link: "https://www.ikea.com/gb/en/p/ragrund-shelving-unit-bamboo-80549420/" },
-  "Black 8-cube shelving unit":                        { photo: 7, link: "https://www.ikea.com/gb/en/p/kallax-shelving-unit-black-brown-20275885/" },
-  "Light wood desk with white legs":                   { photo: 8, link: "https://www.ikea.com/gb/en/p/lagkapten-adils-desk-white-stained-oak-effect-white-s79416874/" },
-  "Black JVC TV (including Amazon Fire TV Stick)":     { photo: 9 },
-  "Black TV stand with silver handles":                { photo: 10 },
-  "Beige rectangular storage box":                     { photo: 12 },
-  "White swivel office chair with black base":         { photo: 13, link: "https://www.ikea.com/gb/en/p/loberget-malskaer-swivel-chair-white-black-s29488571/" },
+  "Black floor lamp with uplighter and reading light": { photos: [], link: "https://www.ikea.com/nl/en/p/tagarp-floor-uplighter-reading-lamp-black-white-40486387/" },
+  "Black coffee table with bottom shelf":              { photos: [], link: "https://www.ikea.com/gb/en/p/lack-tv-bench-white-00625521/" },
+  "Grey and white ergonomic office chair":             { photos: [], link: "https://www.amazon.co.uk/dp/B0BLNW3P7M" },
+  "Grey desk with white legs":                         { photos: [], link: "https://www.ikea.com/gb/en/p/lagkapten-adils-desk-white-stained-oak-effect-white-s79416874/" },
+  "Burgundy 2-drawer chest":                           { photos: ["5-1.jpg"], link: "https://www.ikea.com/gb/en/p/malm-chest-of-2-drawers-high-gloss-white-50336552/" },
+  "Light wood slatted shelving unit":                  { photos: [], link: "https://www.ikea.com/gb/en/p/ragrund-shelving-unit-bamboo-80549420/" },
+  "Black 8-cube shelving unit":                        { photos: [], link: "https://www.ikea.com/gb/en/p/kallax-shelving-unit-black-brown-20275885/" },
+  "Light wood desk with white legs":                   { photos: [], link: "https://www.ikea.com/gb/en/p/lagkapten-adils-desk-white-stained-oak-effect-white-s79416874/" },
+  "Black JVC TV (including Amazon Fire TV Stick)":     { photos: [] },
+  "Black TV stand with silver handles":                { photos: [] },
+  "Beige rectangular storage box":                     { photos: [] },
+  "White swivel office chair with black base":         { photos: [], link: "https://www.ikea.com/gb/en/p/loberget-malskaer-swivel-chair-white-black-s29488571/" },
 };
 
 // Backup copy of the sheet (used only if the sheet can't be reached).
