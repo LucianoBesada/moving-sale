@@ -1,0 +1,43 @@
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#f5f3ef;color:#222;line-height:1.4}
+header{background:#1f2a36;color:#fff;padding:24px 16px 20px}
+header h1{margin:0 0 6px;font-size:1.8rem}
+.intro{margin:0 0 16px;opacity:.9;max-width:640px}
+.contact{background:rgba(255,255,255,.08);border-radius:12px;padding:12px 14px;max-width:640px;display:grid;gap:4px}
+.contact .label{display:inline-block;width:76px;opacity:.7;font-size:.85rem}
+.btn{display:inline-block;margin-top:8px;padding:10px 14px;border-radius:10px;text-decoration:none;font-weight:600;text-align:center}
+.wa{background:#25d366;color:#08331a}
+main{max-width:760px;margin:0 auto;padding:16px}
+.toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:.95rem}
+.toggle{display:flex;gap:6px;align-items:center}
+.notice{background:#fff4d6;border:1px solid #f0d58a;padding:8px 12px;border-radius:8px;font-size:.9rem}
+.list{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.item{display:flex;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08);position:relative}
+.photo{flex:0 0 38%;max-width:220px;min-height:150px;background:#e7e3dc center/cover no-repeat;position:relative;cursor:zoom-in;border:0;padding:0}
+.photo .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#999;font-size:.8rem}
+.info{flex:1;padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.name{font-weight:700;font-size:1.05rem}
+.brand{color:#555;font-size:.92rem}
+.meas{color:#777;font-size:.88rem}
+.meta{margin-top:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-top:6px}
+.price{font-weight:800;font-size:1.15rem}
+.badge{font-size:.75rem;font-weight:700;padding:3px 8px;border-radius:99px;text-transform:uppercase;letter-spacing:.03em}
+.badge.Available{background:#dff5e3;color:#1c6b2c}
+.badge.Reserved{background:#fff0c9;color:#8a6200}
+.badge.Sold{background:#f6d9d9;color:#9b1c1c}
+.ask{font-size:.85rem;color:#128c4a;text-decoration:none;font-weight:600}
+.ref{font-size:.8rem;color:#888}
+.item.sold .photo{filter:grayscale(1);opacity:.55}
+.item.sold .name,.item.sold .price{text-decoration:line-through;color:#888}
+.item.sold::after{content:"SOLD";position:absolute;top:14px;left:-30px;transform:rotate(-35deg);background:#c62828;color:#fff;font-weight:800;padding:2px 40px;font-size:.8rem}
+.small{font-size:.8rem;color:#888;margin-top:16px}
+#lightbox{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:9}
+#lightbox[hidden]{display:none}
+#lightbox img{max-width:95vw;max-height:90vh;border-radius:8px}
+@media(max-width:420px){.info{padding:10px}.name{font-size:.98rem}}
+.more{font-size:.82rem;color:#666}
+.more summary{cursor:pointer;color:#1f5f99;font-weight:600}
+.more ul{margin:4px 0 0;padding-left:18px}
+.askprice{font-size:.9rem;font-weight:700;color:#555}
+.links{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:4px}
+.meta{margin-top:auto}

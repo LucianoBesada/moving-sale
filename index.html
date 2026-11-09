@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Moving sale – furniture & more</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Moving sale</h1>
+  <p class="intro">I'm moving abroad and selling my furniture. Neighbours first! All items are in <strong>very good condition</strong> — collection from my flat.</p>
+  <div class="contact">
+    <div><span class="label">Name</span><span id="c-name"></span></div>
+    <div><span class="label">Address</span><span id="c-address"></span></div>
+    <div><span class="label">WhatsApp</span><span id="c-phone"></span></div>
+    <a id="c-wa" class="btn wa" href="#">Message me on WhatsApp</a>
+  </div>
+</header>
+<main>
+  <div class="toolbar">
+    <span id="count"></span>
+    <label class="toggle"><input type="checkbox" id="hide-sold"> Hide sold</label>
+  </div>
+  <p id="notice" class="notice" hidden></p>
+  <ul id="list" class="list"></ul>
+  <p class="small">Measurements are from the manufacturer's listing; the linked product may show a different colour. Collection from 10 Garrick Close, W5 1AS.</p>
+</main>
+<div id="lightbox" hidden><img alt=""></div>
+<script src="items.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
