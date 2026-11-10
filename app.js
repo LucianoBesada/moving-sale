@@ -2,7 +2,8 @@ const $ = s => document.querySelector(s);
 const waLink = text => `https://wa.me/${SELLER.whatsapp}?text=${encodeURIComponent(text)}`;
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const norm = s => String(s || "").toLowerCase().replace(/\s+/g, " ").trim();
-const EXTRA_BY_NAME = Object.fromEntries(Object.entries(EXTRAS).map(([k, v]) => [norm(k), v]));
+// item name → Number, so a row without a Number still finds its photos
+const NUMBER_BY_NAME = Object.fromEntries(FALLBACK.map(r => [norm(r.item), r.number]));
 
 $("#c-name").textContent = SELLER.name;
 $("#c-address").textContent = SELLER.address;
@@ -22,7 +23,7 @@ function parseCSV(text) {
   if (cur || row.length) { row.push(cur); rows.push(row); }
   const head = rows.shift().map(h => norm(h));
   const col = re => head.findIndex(h => re.test(h));
-  const idx = { item: col(/^(item|name)/), brand: col(/^brand/), status: col(/^status/), price: col(/^price/), measurements: col(/^measure/) };
+  const idx = { number: col(/^(number|no\b|#|id\b)/), item: col(/^(item|name)/), brand: col(/^brand/), status: col(/^status/), price: col(/^price/), measurements: col(/^measure/) };
   return rows.filter(r => r.some(x => x.trim())).map(r =>
     Object.fromEntries(Object.entries(idx).map(([k, i]) => [k, i >= 0 ? (r[i] || "").trim() : ""])));
 }
@@ -32,8 +33,8 @@ const fmtPrice = p => { if (!p) return ""; const n = parseFloat(String(p).replac
 
 // Main dimensions on the card, everything else under "More details"
 function splitMeasurements(m) {
-  const parts = String(m || "").split(/,\s*/).map(s => s.trim()).filter(Boolean);
-  const isMain = p => (/^(width|depth|height|length|overall)\b/i.test(p) && !/inside|drawer/i.test(p)) || !p.includes(":");
+  const parts = String(m || "").split(/,\s*|\n+/).map(s => s.trim()).filter(Boolean);
+  const isMain = p => (/^(width|depth|height|length|overall)\b/i.test(p) && !/inside|drawer/i.test(p)) || (!p.includes(":") && /\d\s*\w*\s+x\s+\d/i.test(p));
   const main = parts.filter(isMain), more = parts.filter(p => !isMain(p));
   return { main: main.join(" · "), more };
 }
@@ -41,8 +42,9 @@ function splitMeasurements(m) {
 let items = [], lastCSV = "";
 function build(rows) {
   return rows.filter(r => r.item).map((r, n) => {
-    const x = EXTRA_BY_NAME[norm(r.item)] || {};
-    return { ...r, order: n, photos: (x.photos || []).map(f => "img/" + f), link: x.link, status: normStatus(r.status), ...splitMeasurements(r.measurements) };
+    const num = String(parseInt(r.number, 10) || NUMBER_BY_NAME[norm(r.item)] || "");
+    const photos = Array.from({ length: PHOTO_COUNT[num] || 0 }, (_, k) => `img/${num}-${k + 1}.jpg`);
+    return { ...r, order: n, photos, link: LINKS[num], status: normStatus(r.status), ...splitMeasurements(r.measurements) };
   });
 }
 
