@@ -23,7 +23,7 @@ function parseCSV(text) {
   if (cur || row.length) { row.push(cur); rows.push(row); }
   const head = rows.shift().map(h => norm(h));
   const col = re => head.findIndex(h => re.test(h));
-  const idx = { number: col(/^(number|no\b|#|id\b)/), item: col(/^(item|name)/), brand: col(/^brand/), status: col(/^status/), price: col(/^price/), measurements: col(/^measure/) };
+  const idx = { number: col(/^(number|no\b|#|id\b)/), item: col(/^(item|name)/), brand: col(/^brand/), status: col(/^status/), price: col(/^price/), measurements: col(/^measure/), link: col(/^(link|url)/) };
   return rows.filter(r => r.some(x => x.trim())).map(r =>
     Object.fromEntries(Object.entries(idx).map(([k, i]) => [k, i >= 0 ? (r[i] || "").trim() : ""])));
 }
@@ -44,7 +44,7 @@ function build(rows) {
   return rows.filter(r => r.item).map((r, n) => {
     const num = String(parseInt(r.number, 10) || NUMBER_BY_NAME[norm(r.item)] || "");
     const photos = Array.from({ length: PHOTO_COUNT[num] || 0 }, (_, k) => `img/${num}-${k + 1}.jpg`);
-    return { ...r, order: n, photos, link: LINKS[num], status: normStatus(r.status), ...splitMeasurements(r.measurements) };
+    return { ...r, order: n, photos, link: /^https?:\/\//i.test(r.link || "") ? r.link : LINKS[num], status: normStatus(r.status), ...splitMeasurements(r.measurements) };
   });
 }
 
@@ -55,7 +55,7 @@ function gallery(i) {
     <div class="track">${i.photos.map((src, k) =>
       `<button class="slide" data-k="${k}" aria-label="Open photo ${k + 1} of ${n}"><img src="${src}" alt="" loading="lazy" draggable="false"></button>`).join("")}</div>
     ${n > 1 ? `<button class="g-nav prev" aria-label="Previous photo">‹</button><button class="g-nav next" aria-label="Next photo">›</button>
-    <div class="dots">${i.photos.map((_, k) => `<span class="${k ? "" : "on"}"></span>`).join("")}</div>
+    ${n <= 8 ? `<div class="dots">${i.photos.map((_, k) => `<span class="${k ? "" : "on"}"></span>`).join("")}</div>` : ""}
     <span class="g-count">1/${n}</span>` : ""}
   </div>`;
 }
